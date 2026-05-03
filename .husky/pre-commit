@@ -1,0 +1,10 @@
+echo "Checking for type errors in server...";
+pnpm typecheck
+echo "Checking completed";
+
+# echo "Formatting server code...";
+# pnpm format
+# echo "Formatting completed";
+# git add .
+
+echo "Done"
