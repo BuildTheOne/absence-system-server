@@ -1,4 +1,5 @@
-import { Module as IModule } from '@/constants/modules/Module';
+import { AuthModule } from './auth.module';
+import { Module as IModule } from './Module';
 
 const mainModule: IModule = {
   name: 'absence-system',
@@ -9,4 +10,5 @@ const mainModule: IModule = {
 
 export const Module = {
   main: mainModule,
+  auth: AuthModule,
 } as const;
