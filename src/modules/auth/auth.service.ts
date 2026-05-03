@@ -10,7 +10,7 @@ import {
   UserSessionRepository,
 } from '@/lib/auth';
 import { BadRequestError, ConflictError, NotFoundError } from '@/lib/error';
-import { CompanyRepository } from '@/modules/auth/repositories/company.repository';
+import { CompanyRepository } from '@/lib/auth/repositories/company.repository';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 

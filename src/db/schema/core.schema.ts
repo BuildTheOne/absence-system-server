@@ -1,11 +1,7 @@
 import {
-  baseFields,
-  companyFields,
-  timestampFields,
-} from '@/db/schema/shared/base.schema';
-import {
   boolean,
   pgSchema,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -23,7 +19,9 @@ export const companyTable = coreSchema.table('company', {
   name: varchar().notNull(),
   code: varchar().notNull().unique(),
   isActive: boolean().default(true),
-  ...timestampFields,
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
 });
 
 export const userAccountTable = coreSchema.table('user_account', {
@@ -33,8 +31,12 @@ export const userAccountTable = coreSchema.table('user_account', {
   email: varchar().notNull().unique(),
   isActive: boolean().notNull().default(true),
   lastLogin: timestamp(),
-  ...companyFields,
-  ...timestampFields,
+  companyId: uuid()
+    .notNull()
+    .references(() => companyTable.id),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
 });
 
 export const userSessionTable = coreSchema.table('user_session', {
@@ -44,7 +46,15 @@ export const userSessionTable = coreSchema.table('user_session', {
     .references(() => userAccountTable.id),
   refreshToken: varchar().notNull(),
   expiredAt: timestamp().notNull(),
-  ...baseFields,
+  companyId: uuid()
+    .notNull()
+    .references(() => companyTable.id),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
+  createdBy: uuid().references(() => userAccountTable.id),
+  updatedBy: uuid().references(() => userAccountTable.id),
+  deletedBy: uuid().references(() => userAccountTable.id),
 });
 
 export const userProfileTable = coreSchema.table('user_profile', {
@@ -54,5 +64,78 @@ export const userProfileTable = coreSchema.table('user_profile', {
     .references(() => userAccountTable.id),
   displayName: varchar().notNull(),
   profilePhoto: varchar(),
-  ...baseFields,
+  companyId: uuid()
+    .notNull()
+    .references(() => companyTable.id),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
+  createdBy: uuid().references(() => userAccountTable.id),
+  updatedBy: uuid().references(() => userAccountTable.id),
+  deletedBy: uuid().references(() => userAccountTable.id),
+});
+
+export const roleTable = coreSchema.table('role', {
+  id: uuid().defaultRandom().primaryKey(),
+  name: varchar('name').notNull(),
+  code: varchar().notNull().unique(),
+  isAdmin: boolean('is_admin').default(false),
+  description: text(),
+  isActive: boolean().default(true),
+  companyId: uuid()
+    .notNull()
+    .references(() => companyTable.id),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
+  createdBy: uuid().references(() => userAccountTable.id),
+  updatedBy: uuid().references(() => userAccountTable.id),
+  deletedBy: uuid().references(() => userAccountTable.id),
+});
+
+export const resourceTable = coreSchema.table('resource', {
+  id: uuid().defaultRandom().primaryKey(),
+  name: varchar().notNull(),
+  code: varchar().notNull().unique(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
+  createdBy: uuid().references(() => userAccountTable.id),
+  updatedBy: uuid().references(() => userAccountTable.id),
+  deletedBy: uuid().references(() => userAccountTable.id),
+});
+
+export const permissionTable = coreSchema.table('permission', {
+  id: uuid().defaultRandom().primaryKey(),
+  code: varchar().notNull().unique(),
+  actionType: permissionActionTypeEnum(),
+  resourceId: uuid()
+    .notNull()
+    .references(() => resourceTable.id),
+  description: text(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
+  createdBy: uuid().references(() => userAccountTable.id),
+  updatedBy: uuid().references(() => userAccountTable.id),
+  deletedBy: uuid().references(() => userAccountTable.id),
+});
+
+export const rolePermissionTable = coreSchema.table('role_permission', {
+  id: uuid().defaultRandom().primaryKey(),
+  roleId: uuid()
+    .notNull()
+    .references(() => roleTable.id),
+  permissionId: uuid()
+    .notNull()
+    .references(() => permissionTable.id),
+  companyId: uuid()
+    .notNull()
+    .references(() => companyTable.id),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp(),
+  deletedAt: timestamp(),
+  createdBy: uuid().references(() => userAccountTable.id),
+  updatedBy: uuid().references(() => userAccountTable.id),
+  deletedBy: uuid().references(() => userAccountTable.id),
 });
