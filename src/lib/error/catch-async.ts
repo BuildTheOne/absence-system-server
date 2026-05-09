@@ -1,32 +1,27 @@
-import { NextFunction } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { BadRequestError } from './api-error';
 
-export const catchAsync = <T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  ErrorClass: new () => Error = BadRequestError
+export const catchAsyncController = (fn: RequestHandler) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+export const catchAsyncRepository = <
+  T extends (...args: any[]) => Promise<any>,
+>(
+  fn: T
 ) => {
   return async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
     try {
-      return await fn(...(args as Parameters<T>));
+      return await fn(...args);
     } catch (error) {
-      const isController = fn.length === 3;
-
-      if (error instanceof Error) {
-        if (isController) {
-          const next = args[2] as NextFunction;
-          next(error);
-          return undefined as Awaited<ReturnType<T>>;
-        }
-        throw error;
-      }
-
-      if (isController) {
-        const next = args[2] as NextFunction;
-        next(new ErrorClass());
-        return undefined as Awaited<ReturnType<T>>;
-      }
-
-      throw new ErrorClass();
+      console.log(error);
+      throw new BadRequestError();
     }
   };
 };

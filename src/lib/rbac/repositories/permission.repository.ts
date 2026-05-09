@@ -1,9 +1,9 @@
 import { permissionTable, rolePermissionTable } from '@/db/schema';
 import { buildWhereClause, db } from '@/lib/db';
-import { catchAsync } from '@/lib/error';
+import { catchAsyncRepository } from '@/lib/error';
 import { eq, inArray } from 'drizzle-orm';
 
-const findAllPermissionRepository = catchAsync(async () => {
+const findAllPermissionRepository = catchAsyncRepository(async () => {
   const whereClause = buildWhereClause({
     table: permissionTable,
   });
@@ -12,7 +12,7 @@ const findAllPermissionRepository = catchAsync(async () => {
   return data;
 });
 
-const findPermissionByRoleIdsRepository = catchAsync(
+const findPermissionByRoleIdsRepository = catchAsyncRepository(
   async (roleIds: string[]) => {
     const whereClause = buildWhereClause({
       table: rolePermissionTable,

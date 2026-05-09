@@ -1,20 +1,22 @@
 import { userSessionTable } from '@/db/schema';
 import { CreateUserSessionDto } from '@/lib/auth';
 import { buildWhereClause, db } from '@/lib/db';
-import { catchAsync } from '@/lib/error';
+import { catchAsyncRepository } from '@/lib/error';
 import { eq } from 'drizzle-orm';
 
-const findUserSessionByIdRepository = catchAsync(async (sessionId: string) => {
-  const whereClause = buildWhereClause({
-    table: userSessionTable,
-    andClause: [eq(userSessionTable.id, sessionId)],
-  });
+const findUserSessionByIdRepository = catchAsyncRepository(
+  async (sessionId: string) => {
+    const whereClause = buildWhereClause({
+      table: userSessionTable,
+      andClause: [eq(userSessionTable.id, sessionId)],
+    });
 
-  const data = await db.select().from(userSessionTable).where(whereClause);
-  return data;
-});
+    const data = await db.select().from(userSessionTable).where(whereClause);
+    return data;
+  }
+);
 
-const findUserSessionByRefreshTokenRepository = catchAsync(
+const findUserSessionByRefreshTokenRepository = catchAsyncRepository(
   async (refreshToken: string) => {
     const whereClause = buildWhereClause({
       table: userSessionTable,
@@ -26,14 +28,14 @@ const findUserSessionByRefreshTokenRepository = catchAsync(
   }
 );
 
-const createUserSessionRepository = catchAsync(
+const createUserSessionRepository = catchAsyncRepository(
   async (inputData: CreateUserSessionDto) => {
     const data = await db.insert(userSessionTable).values(inputData);
     return data;
   }
 );
 
-const deleteUserSessionByIdRepository = catchAsync(
+const deleteUserSessionByIdRepository = catchAsyncRepository(
   async (sessionId: string) => {
     const data = await db
       .delete(userSessionTable)
@@ -43,7 +45,7 @@ const deleteUserSessionByIdRepository = catchAsync(
   }
 );
 
-const deleteUserSessionByUserIdRepository = catchAsync(
+const deleteUserSessionByUserIdRepository = catchAsyncRepository(
   async (userId: string) => {
     const data = await db
       .delete(userSessionTable)

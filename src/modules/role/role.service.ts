@@ -1,4 +1,4 @@
-import { filterQueryResult } from '@/lib/db';
+import { CompanyQueryFilter, filterQueryResult } from '@/lib/db';
 import { NotFoundError } from '@/lib/error';
 import {
   CreateRoleDto,
@@ -8,14 +8,17 @@ import {
 } from '@/lib/rbac';
 import { formatString } from '@/lib/utils';
 
-async function findAllRoleService() {
-  const data = await RoleRepository.findAll();
+async function findAllRoleService(companyFilter: CompanyQueryFilter) {
+  const data = await RoleRepository.findAll(companyFilter);
   const formattedData = filterQueryResult(roleSchema, data);
   return formattedData;
 }
 
-async function findRoleByIdService(id: string) {
-  const data = await RoleRepository.findById(id);
+async function findRoleByIdService(
+  id: string,
+  companyFilter: CompanyQueryFilter
+) {
+  const data = await RoleRepository.findById(id, companyFilter);
 
   if (!data) {
     throw new NotFoundError();

@@ -2,6 +2,7 @@ export * from './dto/jwt-payload';
 export * from './dto/sign-up.dto';
 export * from './dto/user-session.dto';
 export * from './middlewares/session.middleware';
+export * from './repositories/company.repository';
 export * from './repositories/user-account.repository';
 export * from './repositories/user-session.repository';
 export * from './types/jwt-error';

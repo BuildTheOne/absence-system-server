@@ -1,24 +1,26 @@
 import { userAccountTable } from '@/db/schema';
 import { SignUpDto } from '@/lib/auth/dto/sign-up.dto';
 import { buildWhereClause, db } from '@/lib/db';
-import { catchAsync } from '@/lib/error';
+import { catchAsyncRepository } from '@/lib/error';
 import { randomUUID } from 'crypto';
 import { eq } from 'drizzle-orm';
 
-const findUserAccountByIdRepository = catchAsync(async (userId: string) => {
-  const whereClause = buildWhereClause({
-    table: userAccountTable,
-    andClause: [
-      eq(userAccountTable.isActive, true),
-      eq(userAccountTable.id, userId),
-    ],
-  });
+const findUserAccountByIdRepository = catchAsyncRepository(
+  async (userId: string) => {
+    const whereClause = buildWhereClause({
+      table: userAccountTable,
+      andClause: [
+        eq(userAccountTable.isActive, true),
+        eq(userAccountTable.id, userId),
+      ],
+    });
 
-  const data = await db.select().from(userAccountTable).where(whereClause);
-  return data;
-});
+    const data = await db.select().from(userAccountTable).where(whereClause);
+    return data;
+  }
+);
 
-const findUserAccountByCredentialRepository = catchAsync(
+const findUserAccountByCredentialRepository = catchAsyncRepository(
   async (payload: string) => {
     const whereClause = buildWhereClause({
       table: userAccountTable,
@@ -34,20 +36,22 @@ const findUserAccountByCredentialRepository = catchAsync(
   }
 );
 
-const createUserAccountRepository = catchAsync(async (inputData: SignUpDto) => {
-  const data = await db
-    .insert(userAccountTable)
-    .values({
-      ...inputData,
-      id: randomUUID(),
-      isActive: true,
-      companyId: inputData.companyCode,
-    })
-    .returning();
-  return data;
-});
+const createUserAccountRepository = catchAsyncRepository(
+  async (inputData: SignUpDto) => {
+    const data = await db
+      .insert(userAccountTable)
+      .values({
+        ...inputData,
+        id: randomUUID(),
+        isActive: true,
+        companyId: inputData.companyCode,
+      })
+      .returning();
+    return data;
+  }
+);
 
-const updateUserAccountLastLoginByIdRepository = catchAsync(
+const updateUserAccountLastLoginByIdRepository = catchAsyncRepository(
   async (userId: string) => {
     const data = await db
       .update(userAccountTable)
@@ -60,7 +64,7 @@ const updateUserAccountLastLoginByIdRepository = catchAsync(
   }
 );
 
-const updateUserAccountPasswordByIdRepository = catchAsync(
+const updateUserAccountPasswordByIdRepository = catchAsyncRepository(
   async (userId: string, password: string) => {
     const whereClause = buildWhereClause({
       table: userAccountTable,

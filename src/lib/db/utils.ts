@@ -1,13 +1,13 @@
-import { and, isNull, or, SQL } from 'drizzle-orm';
+import { getUser } from '@/lib/auth';
+import { and, eq, isNull, or, SQL } from 'drizzle-orm';
 import { PgSelect, PgTableWithColumns, TableConfig } from 'drizzle-orm/pg-core';
+import { Request } from 'express';
 import { ZodType } from 'zod';
-
-type WhereClauseProps<T extends TableConfig> = {
-  table: PgTableWithColumns<T>;
-  andClause?: SQL[];
-  orClause?: SQL[];
-  showDeleted?: boolean;
-};
+import {
+  CompanyQueryFilter,
+  PaginationQueryParam,
+  WhereClauseProps,
+} from './types';
 
 export const buildWhereClause = <T extends TableConfig>(
   whereClauseProps: WhereClauseProps<T>
@@ -30,11 +30,6 @@ export const buildWhereClause = <T extends TableConfig>(
   }
 
   return and(...whereAnd, or(...whereOr));
-};
-
-export type PaginationQueryParam = {
-  page?: number;
-  pageSize?: number;
 };
 
 type PaginationClauseProps<T extends PgSelect> = {
@@ -68,4 +63,22 @@ export const filterQueryResult = <T extends ZodType>(
     return rawData.map((data) => schema.parse(data));
   }
   return schema.parse(rawData);
+};
+
+export const companyQueryFilter = async (req: Request) => {
+  const { companyId } = await getUser(req);
+  const companyFilter: CompanyQueryFilter = {
+    companyId: companyId,
+  };
+  return companyFilter;
+};
+
+export const buildCompanyFilter = <T extends TableConfig>(
+  table: PgTableWithColumns<T>,
+  companyFilter: CompanyQueryFilter
+) => {
+  return [
+    eq(table.companyId, companyFilter.companyId),
+    isNull(table.deletedAt),
+  ];
 };

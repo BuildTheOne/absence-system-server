@@ -1,30 +1,46 @@
 import { employeeRoleTable, roleTable } from '@/db/schema';
-import { buildWhereClause, db } from '@/lib/db';
-import { catchAsync } from '@/lib/error';
+import {
+  buildCompanyFilter,
+  buildWhereClause,
+  CompanyQueryFilter,
+  db,
+} from '@/lib/db';
+import { catchAsyncRepository } from '@/lib/error';
 import { RoleDto } from '@/lib/rbac/dto/role.dto';
 import { eq, sql } from 'drizzle-orm';
 
-const findAllRoleRepository = catchAsync(async () => {
-  const whereClause = buildWhereClause({
-    table: roleTable,
-    andClause: [eq(roleTable.isActive, true)],
-  });
+const findAllRoleRepository = catchAsyncRepository(
+  async (companyFilter: CompanyQueryFilter) => {
+    const whereClause = buildWhereClause({
+      table: roleTable,
+      andClause: [
+        ...buildCompanyFilter(roleTable, companyFilter),
+        eq(roleTable.isActive, true),
+      ],
+    });
 
-  const data = await db.select().from(roleTable).where(whereClause);
-  return data;
-});
+    const data = await db.select().from(roleTable).where(whereClause);
+    return data;
+  }
+);
 
-const findRoleByIdRepository = catchAsync(async (roleId: string) => {
-  const whereClause = buildWhereClause({
-    table: roleTable,
-    andClause: [eq(roleTable.id, roleId), eq(roleTable.isActive, true)],
-  });
+const findRoleByIdRepository = catchAsyncRepository(
+  async (id: string, companyFilter: CompanyQueryFilter) => {
+    const whereClause = buildWhereClause({
+      table: roleTable,
+      andClause: [
+        ...buildCompanyFilter(roleTable, companyFilter),
+        eq(roleTable.id, id),
+        eq(roleTable.isActive, true),
+      ],
+    });
 
-  const data = await db.select().from(roleTable).where(whereClause).limit(1);
-  return data[0];
-});
+    const data = await db.select().from(roleTable).where(whereClause).limit(1);
+    return data[0];
+  }
+);
 
-const findRoleByEmployeeIdRepository = catchAsync(
+const findRoleByEmployeeIdRepository = catchAsyncRepository(
   async (employeeId: string) => {
     const whereClause = buildWhereClause({
       table: employeeRoleTable,
@@ -41,7 +57,7 @@ const findRoleByEmployeeIdRepository = catchAsync(
   }
 );
 
-const createRoleRepository = catchAsync(async (data: RoleDto) => {
+const createRoleRepository = catchAsyncRepository(async (data: RoleDto) => {
   const createdData = await db
     .insert(roleTable)
     .values({
@@ -52,11 +68,11 @@ const createRoleRepository = catchAsync(async (data: RoleDto) => {
   return createdData[0];
 });
 
-const updateRoleRepository = catchAsync(
-  async (roleId: string, data: RoleDto) => {
+const updateRoleRepository = catchAsyncRepository(
+  async (id: string, data: RoleDto) => {
     const whereClause = buildWhereClause({
       table: roleTable,
-      andClause: [eq(roleTable.id, roleId), eq(roleTable.isActive, true)],
+      andClause: [eq(roleTable.id, id), eq(roleTable.isActive, true)],
     });
 
     const updatedData = await db
@@ -71,10 +87,10 @@ const updateRoleRepository = catchAsync(
   }
 );
 
-const deleteRoleRepository = catchAsync(async (roleId: string) => {
+const deleteRoleRepository = catchAsyncRepository(async (id: string) => {
   const whereClause = buildWhereClause({
     table: roleTable,
-    andClause: [eq(roleTable.id, roleId), eq(roleTable.isActive, true)],
+    andClause: [eq(roleTable.id, id), eq(roleTable.isActive, true)],
   });
 
   const updatedData = await db
