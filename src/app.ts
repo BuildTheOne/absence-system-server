@@ -18,7 +18,7 @@ app.use(helmet());
 app.use(compression());
 app.use(xss());
 app.use(cors());
-app.use(rateLimiter());
+// app.use(rateLimiter());
 
 app.use(loggerMiddleware);
 

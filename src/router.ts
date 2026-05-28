@@ -4,9 +4,9 @@ import { Module } from '@/constants/modules';
 import { Route } from '@/constants/routes';
 import { sessionMiddleware } from '@/lib/auth';
 import { catchAsyncController } from '@/lib/error';
-import { rateLimiter } from '@/lib/rate-limiter';
 import { BaseResponse } from '@/lib/response';
 import { authRouter } from '@/modules/auth/auth.router';
+import { profileRouter } from '@/modules/profile/profile.router';
 import { roleRouter } from '@/modules/role/role.router';
 import { Request, Response, Router } from 'express';
 
@@ -26,7 +26,9 @@ const apiInfoController = catchAsyncController(
 const appRouter = Router();
 
 appRouter.get(Route.main, apiInfoController);
-appRouter.use(Route.auth, rateLimiter(60, 5), authRouter);
+// appRouter.use(Route.auth, rateLimiter(60, 5), authRouter);
+appRouter.use(Route.auth, authRouter);
 appRouter.use(Route.rbac.role, sessionMiddleware, roleRouter);
+appRouter.use(Route.profile, sessionMiddleware, profileRouter);
 
 export { appRouter };

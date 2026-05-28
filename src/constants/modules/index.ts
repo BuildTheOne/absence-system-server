@@ -1,6 +1,7 @@
 import { AuthModule } from './auth.module';
 import { MasterModule } from './master.module';
 import { Module as IModule } from './Module';
+import { ProfileModule } from './profile.module';
 import { RBACModule } from './rbac.module';
 
 const mainModule: IModule = {
@@ -14,5 +15,6 @@ export const Module = {
   main: mainModule,
   auth: AuthModule,
   rbac: RBACModule,
+  profile: ProfileModule,
   master: MasterModule,
 } as const;

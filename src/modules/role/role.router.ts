@@ -1,7 +1,7 @@
 import { createRoleSchema, updateRoleSchema } from '@/lib/rbac';
 import { validateForm } from '@/lib/validation';
-import { RoleController } from '@/modules/role/role.controller';
 import { Router } from 'express';
+import { RoleController } from './role.controller';
 
 const roleRouter = Router();
 

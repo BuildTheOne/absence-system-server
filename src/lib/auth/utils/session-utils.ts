@@ -1,6 +1,5 @@
 import { Message } from '@/constants/messages';
 import {
-  JwtInvalidError,
   JwtPayload,
   UserAccountRepository,
   UserSessionRepository,
@@ -10,17 +9,7 @@ import { UnauthorizedError } from '@/lib/error';
 import { Request } from 'express';
 
 export async function verifySession(req: Request) {
-  const authorizationToken = req.headers['authorization'];
-
-  if (!authorizationToken) {
-    throw new JwtInvalidError();
-  }
-
-  const [bearer, token] = authorizationToken.split(' ');
-  if (bearer !== 'Bearer') {
-    throw new JwtInvalidError();
-  }
-
+  const token = getToken(req);
   const tokenPayload = await verifyJwt<JwtPayload>(token);
 
   const userList = await UserAccountRepository.findByCredential(
@@ -40,6 +29,35 @@ export async function verifySession(req: Request) {
     session: sessionList[0],
     user: userList[0],
   };
+}
+
+function getToken(req: Request) {
+  const authorizationToken = req.headers['authorization'] ?? '';
+
+  if (authorizationToken.startsWith('Bearer ')) {
+    return authorizationToken.split(' ')[1];
+  }
+
+  const cookiesRaw = req.headers['cookie'] ?? '';
+  const cookies = cookiesRaw.split(';').reduce(
+    (cookies, cookie) => {
+      const [rawKey, rawValue] = cookie.split('=');
+      if (!rawKey || !rawValue) return cookies;
+
+      const key = rawKey.trim();
+      const value = decodeURIComponent(rawValue.trim());
+
+      cookies[key] = value;
+      return cookies;
+    },
+    {} as Record<string, string>
+  );
+
+  if (cookies.accessToken) {
+    return cookies.accessToken;
+  }
+
+  throw new UnauthorizedError();
 }
 
 export async function getUser(req: Request) {

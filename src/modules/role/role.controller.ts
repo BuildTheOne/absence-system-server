@@ -5,7 +5,7 @@ import { companyQueryFilter } from '@/lib/db';
 import { catchAsyncController } from '@/lib/error';
 import { CreateRoleDto, UpdateRoleDto } from '@/lib/rbac';
 import { BaseResponse } from '@/lib/response';
-import { RoleService } from '@/modules/role/role.service';
+import { RoleService } from './role.service';
 
 const findAllRoleController = catchAsyncController(async (req, res) => {
   const companyFilter = await companyQueryFilter(req);
