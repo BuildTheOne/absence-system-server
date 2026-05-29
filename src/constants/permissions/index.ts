@@ -1,7 +1,7 @@
-import { MasterPermission } from '@/constants/permissions/master';
-import { RBACPermission } from '@/constants/permissions/rbac';
+import { EmployeePermission } from './employee.permission';
+import { RBACPermission } from './rbac.permission';
 
 export const Permission = {
   rbac: RBACPermission,
-  master: MasterPermission,
+  employee: EmployeePermission,
 };
