@@ -1,4 +1,4 @@
-import { Module } from '@/constants/modules/Module';
+import { Module } from './Module';
 
 const role: Module = {
   name: 'Role',
