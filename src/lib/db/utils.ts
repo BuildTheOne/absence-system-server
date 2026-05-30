@@ -6,6 +6,8 @@ import { ZodType } from 'zod';
 import {
   CompanyQueryFilter,
   PaginationQueryParam,
+  QueryParamFilter,
+  UserQueryFilter,
   WhereClauseProps,
 } from './types';
 
@@ -81,4 +83,24 @@ export const buildCompanyFilter = <T extends TableConfig>(
     eq(table.companyId, companyFilter.companyId),
     isNull(table.deletedAt),
   ];
+};
+
+export const userQueryFilter = async (req: Request) => {
+  const { id: userId } = await getUser(req);
+  const userFilter: UserQueryFilter = {
+    userId: userId,
+  };
+  return userFilter;
+};
+
+export const buildQueryFilter = async (req: Request) => {
+  const companyFilter = await companyQueryFilter(req);
+  const userFilter = await userQueryFilter(req);
+
+  const filter: QueryParamFilter = {
+    company: companyFilter,
+    user: userFilter,
+  };
+
+  return filter;
 };

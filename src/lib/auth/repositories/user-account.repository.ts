@@ -56,7 +56,7 @@ const updateUserAccountLastLoginByIdRepository = catchAsyncRepository(
     const data = await db
       .update(userAccountTable)
       .set({
-        lastLogin: new Date(),
+        lastLoginAt: new Date(),
       })
       .where(eq(userAccountTable.id, userId))
       .returning();

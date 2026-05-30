@@ -9,6 +9,7 @@ import { authRouter } from '@/modules/auth/auth.router';
 import { profileRouter } from '@/modules/profile/profile.router';
 import { roleRouter } from '@/modules/role/role.router';
 import { Request, Response, Router } from 'express';
+import { employeeRouter } from './modules/employee/employee.router';
 
 const apiInfoController = catchAsyncController(
   async (_: Request, res: Response) => {
@@ -30,5 +31,6 @@ appRouter.get(Route.main, apiInfoController);
 appRouter.use(Route.auth, authRouter);
 appRouter.use(Route.rbac.role, sessionMiddleware, roleRouter);
 appRouter.use(Route.profile, sessionMiddleware, profileRouter);
+appRouter.use(Route.employee, sessionMiddleware, employeeRouter);
 
 export { appRouter };

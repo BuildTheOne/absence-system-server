@@ -9,5 +9,5 @@ export default defineConfig({
     url: process.env.DB_URL!,
   },
   casing: 'snake_case',
-  schemaFilter: ['core', 'master'],
+  schemaFilter: ['core', 'master', 'hr'],
 });

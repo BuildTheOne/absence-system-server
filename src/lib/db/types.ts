@@ -17,7 +17,12 @@ export type CompanyQueryFilter = {
   companyId: string;
 };
 
-export type QueryParam = {
+export type UserQueryFilter = {
+  userId: string;
+};
+
+export type QueryParamFilter = {
   company: CompanyQueryFilter;
+  user: UserQueryFilter;
   pagination?: PaginationQueryParam;
 };
