@@ -1,0 +1,3 @@
+ALTER TABLE "hr"."employee_absence" ALTER COLUMN "work_location_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "master"."employee" ADD COLUMN "work_location_id" uuid;--> statement-breakpoint
+ALTER TABLE "master"."employee" ADD CONSTRAINT "employee_work_location_id_work_location_id_fk" FOREIGN KEY ("work_location_id") REFERENCES "master"."work_location"("id") ON DELETE no action ON UPDATE no action;

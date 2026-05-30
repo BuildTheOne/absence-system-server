@@ -6,6 +6,7 @@ import {
   UpdateEmployeeDto,
 } from '../dto/employee.dto';
 import { EmployeeRepository } from '../repositories/employee.repository';
+import { EmployeeAbsenceService } from './employee-absence.service';
 
 async function findAllEmployeeService(filter: QueryParamFilter) {
   const data = await EmployeeRepository.findAll(filter);
@@ -15,13 +16,20 @@ async function findAllEmployeeService(filter: QueryParamFilter) {
 
 async function findEmployeeByIdService(id: string, filter: QueryParamFilter) {
   const data = await EmployeeRepository.findById(id, filter);
-
   if (!data) {
     throw new NotFoundError();
   }
-
   const formattedData = filterQueryResult(employeeSchema, data);
-  return formattedData;
+
+  const absenceData = await EmployeeAbsenceService.findByEmployeeId(
+    data.id,
+    filter
+  );
+
+  return {
+    ...formattedData,
+    absence: absenceData,
+  };
 }
 
 async function createEmployeeService(

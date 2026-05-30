@@ -1,0 +1,4 @@
+ALTER TABLE "hr"."employee_absence" ADD COLUMN "company_id" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "hr"."employee_activity" ADD COLUMN "company_id" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "hr"."employee_absence" ADD CONSTRAINT "employee_absence_company_id_company_id_fk" FOREIGN KEY ("company_id") REFERENCES "core"."company"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "hr"."employee_activity" ADD CONSTRAINT "employee_activity_company_id_company_id_fk" FOREIGN KEY ("company_id") REFERENCES "core"."company"("id") ON DELETE no action ON UPDATE no action;

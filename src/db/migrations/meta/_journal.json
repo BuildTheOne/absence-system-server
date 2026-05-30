@@ -36,6 +36,20 @@
       "when": 1780103154502,
       "tag": "0004_employee",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780110556110,
+      "tag": "0005_employee-absence-fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780111986389,
+      "tag": "0006_employee-hr-company-fix",
+      "breakpoints": true
     }
   ]
 }

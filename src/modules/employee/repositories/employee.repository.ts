@@ -15,10 +15,7 @@ const findAllEmployeeRepository = catchAsyncRepository(
 
     const whereClause = buildWhereClause({
       table: employeeTable,
-      andClause: [
-        ...buildCompanyFilter(employeeTable, companyFilter),
-        eq(employeeTable.isActive, true),
-      ],
+      andClause: [...buildCompanyFilter(employeeTable, companyFilter)],
     });
 
     const data = await db.select().from(employeeTable).where(whereClause);
@@ -35,7 +32,6 @@ const findEmployeeByIdRepository = catchAsyncRepository(
       andClause: [
         ...buildCompanyFilter(employeeTable, companyFilter),
         eq(employeeTable.id, id),
-        eq(employeeTable.isActive, true),
       ],
     });
 

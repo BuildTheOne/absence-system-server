@@ -44,6 +44,7 @@ export const employeeTable = masterSchema.table('employee', {
   outDate: date(),
   faceEmbedding: text(),
   departmentId: uuid().references(() => departmentTable.id),
+  workLocationId: uuid().references(() => workLocationTable.id),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp(),
   deletedAt: timestamp(),

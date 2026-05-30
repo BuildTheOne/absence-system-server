@@ -1,4 +1,4 @@
-import { userAccountTable } from '@/db/schema/core.schema';
+import { companyTable, userAccountTable } from '@/db/schema/core.schema';
 import {
   doublePrecision,
   pgSchema,
@@ -22,9 +22,10 @@ export const employeeAbsenceTable = hrSchema.table('employee_absence', {
   lat: doublePrecision(),
   lng: doublePrecision(),
   distance: doublePrecision(),
-  workLocationId: uuid()
+  workLocationId: uuid().references(() => workLocationTable.id),
+  companyId: uuid()
     .notNull()
-    .references(() => workLocationTable.id),
+    .references(() => companyTable.id),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp(),
   deletedAt: timestamp(),
@@ -44,6 +45,9 @@ export const employeeActivityTable = hrSchema.table('employee_activity', {
   workLocationId: uuid()
     .notNull()
     .references(() => workLocationTable.id),
+  companyId: uuid()
+    .notNull()
+    .references(() => companyTable.id),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp(),
   deletedAt: timestamp(),

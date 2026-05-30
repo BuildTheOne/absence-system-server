@@ -9,14 +9,14 @@ const employee: Module = {
 
 const employeeAbsence: Module = {
   name: 'Employee Absence',
-  url: '/employee/absence',
+  url: '/absence',
   label: 'module.employee.absence.title',
   desc: 'module.employee.absence.description',
 };
 
 const employeeActivity: Module = {
   name: 'Employee Activity',
-  url: '/employee/activity',
+  url: '/activity',
   label: 'module.employee.activity.title',
   desc: 'module.employee.activity.description',
 };

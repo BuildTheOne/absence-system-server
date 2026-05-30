@@ -1,6 +1,7 @@
 import { employeeTable } from '@/db/schema';
 import { createInsertSchema } from 'drizzle-zod';
 import z from 'zod';
+import { EmployeeAbsenceDto } from './employee-absence.dto';
 
 export const employeeSchema = createInsertSchema(employeeTable)
   .pick({
@@ -27,7 +28,9 @@ export const employeeSchema = createInsertSchema(employeeTable)
     joinDate: z.coerce.date().nullish(),
     outDate: z.coerce.date().nullish(),
   });
-export type EmployeeDto = z.infer<typeof employeeSchema>;
+export type EmployeeDto = z.infer<typeof employeeSchema> & {
+  absence: EmployeeAbsenceDto[];
+};
 
 export const createEmployeeSchema = employeeSchema.pick({
   name: true,
