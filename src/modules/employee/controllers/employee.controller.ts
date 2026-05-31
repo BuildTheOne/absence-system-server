@@ -8,8 +8,8 @@ import { EmployeeService } from '../services/employee.service';
 
 const findAllEmployeeController = catchAsyncController(async (req, res) => {
   const filter = await buildQueryFilter(req);
-  const data = await EmployeeService.findAll(filter);
-  res.json(BaseResponse(HttpStatus.OK, Message.SUCCESS, data));
+  const { data, total } = await EmployeeService.findAll(filter);
+  res.json(BaseResponse(HttpStatus.OK, Message.SUCCESS, data, total));
 });
 
 const findEmployeeByIdController = catchAsyncController(async (req, res) => {

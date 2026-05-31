@@ -1,5 +1,6 @@
-import { filterQueryResult, QueryParamFilter } from '@/lib/db';
+import { QueryParam } from '@/lib/db';
 import { NotFoundError } from '@/lib/error';
+import { filterResult } from '@/lib/validation';
 import {
   CreateEmployeeDto,
   employeeSchema,
@@ -8,18 +9,18 @@ import {
 import { EmployeeRepository } from '../repositories/employee.repository';
 import { EmployeeAbsenceService } from './employee-absence.service';
 
-async function findAllEmployeeService(filter: QueryParamFilter) {
-  const data = await EmployeeRepository.findAll(filter);
-  const formattedData = filterQueryResult(employeeSchema, data);
-  return formattedData;
+async function findAllEmployeeService(filter: QueryParam) {
+  const { data, total } = await EmployeeRepository.findAll(filter);
+  const formattedData = filterResult(employeeSchema, data);
+  return { data: formattedData, total };
 }
 
-async function findEmployeeByIdService(id: string, filter: QueryParamFilter) {
+async function findEmployeeByIdService(id: string, filter: QueryParam) {
   const data = await EmployeeRepository.findById(id, filter);
   if (!data) {
     throw new NotFoundError();
   }
-  const formattedData = filterQueryResult(employeeSchema, data);
+  const formattedData = filterResult(employeeSchema, data);
 
   const absenceData = await EmployeeAbsenceService.findByEmployeeId(
     data.id,
@@ -34,7 +35,7 @@ async function findEmployeeByIdService(id: string, filter: QueryParamFilter) {
 
 async function createEmployeeService(
   inputData: CreateEmployeeDto,
-  filter: QueryParamFilter
+  filter: QueryParam
 ) {
   const data = await EmployeeRepository.create(inputData, filter);
 
@@ -42,14 +43,14 @@ async function createEmployeeService(
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(employeeSchema, data);
+  const formattedData = filterResult(employeeSchema, data);
   return formattedData;
 }
 
 async function updateEmployeeService(
   employeeId: string,
   inputData: UpdateEmployeeDto,
-  filter: QueryParamFilter
+  filter: QueryParam
 ) {
   const data = await EmployeeRepository.update(employeeId, inputData, filter);
 
@@ -57,14 +58,11 @@ async function updateEmployeeService(
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(employeeSchema, data);
+  const formattedData = filterResult(employeeSchema, data);
   return formattedData;
 }
 
-async function deleteEmployeeService(
-  employeeId: string,
-  filter: QueryParamFilter
-) {
+async function deleteEmployeeService(employeeId: string, filter: QueryParam) {
   const data = await EmployeeRepository.delete(employeeId, filter);
 
   if (!data) {

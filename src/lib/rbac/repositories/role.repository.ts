@@ -2,7 +2,7 @@ import { employeeRoleTable, roleTable } from '@/db/schema';
 import {
   buildCompanyFilter,
   buildWhereClause,
-  CompanyQueryFilter,
+  CompanyFilter,
   db,
 } from '@/lib/db';
 import { catchAsyncRepository } from '@/lib/error';
@@ -10,7 +10,7 @@ import { RoleDto } from '@/lib/rbac/dto/role.dto';
 import { eq, sql } from 'drizzle-orm';
 
 const findAllRoleRepository = catchAsyncRepository(
-  async (companyFilter: CompanyQueryFilter) => {
+  async (companyFilter: CompanyFilter) => {
     const whereClause = buildWhereClause({
       table: roleTable,
       andClause: [
@@ -25,7 +25,7 @@ const findAllRoleRepository = catchAsyncRepository(
 );
 
 const findRoleByIdRepository = catchAsyncRepository(
-  async (id: string, companyFilter: CompanyQueryFilter) => {
+  async (id: string, companyFilter: CompanyFilter) => {
     const whereClause = buildWhereClause({
       table: roleTable,
       andClause: [

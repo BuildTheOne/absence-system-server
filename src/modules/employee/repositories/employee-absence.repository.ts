@@ -1,16 +1,18 @@
 import { employeeAbsenceTable } from '@/db/schema';
 import {
+  buildCompanyData,
   buildCompanyFilter,
+  buildUserData,
   buildWhereClause,
   db,
-  QueryParamFilter,
+  QueryParam,
 } from '@/lib/db';
 import { catchAsyncRepository } from '@/lib/error';
 import { eq, sql } from 'drizzle-orm';
 import { CreateEmployeeAbsenceDto } from '../dto/employee-absence.dto';
 
 const findAllEmployeeAbsenceRepository = catchAsyncRepository(
-  async (filter: QueryParamFilter) => {
+  async (filter: QueryParam) => {
     const { company: companyFilter } = filter;
 
     const whereClause = buildWhereClause({
@@ -28,7 +30,7 @@ const findAllEmployeeAbsenceRepository = catchAsyncRepository(
 );
 
 const findEmployeeAbsenceByEmployeeIdRepository = catchAsyncRepository(
-  async (employeeId: string, filter: QueryParamFilter) => {
+  async (employeeId: string, filter: QueryParam) => {
     const { company: companyFilter } = filter;
 
     const whereClause = buildWhereClause({
@@ -49,7 +51,7 @@ const findEmployeeAbsenceByEmployeeIdRepository = catchAsyncRepository(
 );
 
 const findEmployeeAbsenceByIdRepository = catchAsyncRepository(
-  async (id: string, filter: QueryParamFilter) => {
+  async (id: string, filter: QueryParam) => {
     const { company: companyFilter } = filter;
 
     const whereClause = buildWhereClause({
@@ -65,22 +67,24 @@ const findEmployeeAbsenceByIdRepository = catchAsyncRepository(
       .from(employeeAbsenceTable)
       .where(whereClause)
       .limit(1);
+
     return data[0];
   }
 );
 
 const createEmployeeAbsenceRepository = catchAsyncRepository(
-  async (data: CreateEmployeeAbsenceDto, filter: QueryParamFilter) => {
+  async (data: CreateEmployeeAbsenceDto, filter: QueryParam) => {
     const { company: companyFilter, user: userFilter } = filter;
+    const companyData = buildCompanyData(companyFilter);
+    const userData = buildUserData(userFilter, 'CREATE');
 
     const createdData = await db
       .insert(employeeAbsenceTable)
       .values({
         ...data,
         date: sql`CURRENT_TIMESTAMP`,
-        companyId: companyFilter.companyId,
-        createdAt: sql`CURRENT_TIMESTAMP`,
-        createdBy: userFilter.userId,
+        ...companyData,
+        ...userData,
       })
       .returning();
 

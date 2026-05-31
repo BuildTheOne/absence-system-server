@@ -1,4 +1,4 @@
-import { CompanyQueryFilter, filterQueryResult } from '@/lib/db';
+import { CompanyFilter } from '@/lib/db';
 import { NotFoundError } from '@/lib/error';
 import {
   CreateRoleDto,
@@ -7,24 +7,22 @@ import {
   UpdateRoleDto,
 } from '@/lib/rbac';
 import { formatString } from '@/lib/utils';
+import { filterResult } from '@/lib/validation';
 
-async function findAllRoleService(companyFilter: CompanyQueryFilter) {
+async function findAllRoleService(companyFilter: CompanyFilter) {
   const data = await RoleRepository.findAll(companyFilter);
-  const formattedData = filterQueryResult(roleSchema, data);
+  const formattedData = filterResult(roleSchema, data);
   return formattedData;
 }
 
-async function findRoleByIdService(
-  id: string,
-  companyFilter: CompanyQueryFilter
-) {
+async function findRoleByIdService(id: string, companyFilter: CompanyFilter) {
   const data = await RoleRepository.findById(id, companyFilter);
 
   if (!data) {
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(roleSchema, data);
+  const formattedData = filterResult(roleSchema, data);
   return formattedData;
 }
 
@@ -39,7 +37,7 @@ async function createRoleService(inputData: CreateRoleDto, companyId: string) {
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(roleSchema, data);
+  const formattedData = filterResult(roleSchema, data);
   return formattedData;
 }
 
@@ -58,7 +56,7 @@ async function updateRoleService(
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(roleSchema, data);
+  const formattedData = filterResult(roleSchema, data);
   return formattedData;
 }
 

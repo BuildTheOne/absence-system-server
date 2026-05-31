@@ -1,30 +1,53 @@
 import { employeeTable } from '@/db/schema';
 import {
+  buildCompanyData,
   buildCompanyFilter,
+  buildPaginationQuery,
+  buildUserData,
   buildWhereClause,
   db,
-  QueryParamFilter,
+  QueryParam,
 } from '@/lib/db';
 import { catchAsyncRepository } from '@/lib/error';
-import { eq, sql } from 'drizzle-orm';
+import { count, eq, sql } from 'drizzle-orm';
 import { CreateEmployeeDto, UpdateEmployeeDto } from '../dto/employee.dto';
 
 const findAllEmployeeRepository = catchAsyncRepository(
-  async (filter: QueryParamFilter) => {
-    const { company: companyFilter } = filter;
+  async (filter: QueryParam) => {
+    const {
+      company: companyFilter,
+      pagination: paginationParam,
+      search: searchParam,
+    } = filter;
+
+    const query = db.select().from(employeeTable).$dynamic();
 
     const whereClause = buildWhereClause({
       table: employeeTable,
       andClause: [...buildCompanyFilter(employeeTable, companyFilter)],
+      search: searchParam,
+      searchField: ['name'],
     });
 
-    const data = await db.select().from(employeeTable).where(whereClause);
-    return data;
+    const queryPaginated = buildPaginationQuery({
+      query,
+      page: paginationParam?.page,
+      pageSize: paginationParam?.pageSize,
+    });
+
+    const data = await queryPaginated.where(whereClause);
+
+    const [total] = await db
+      .select({ count: count() })
+      .from(employeeTable)
+      .where(whereClause);
+
+    return { data, total: total.count };
   }
 );
 
 const findEmployeeByIdRepository = catchAsyncRepository(
-  async (id: string, filter: QueryParamFilter) => {
+  async (id: string, filter: QueryParam) => {
     const { company: companyFilter } = filter;
 
     const whereClause = buildWhereClause({
@@ -40,27 +63,28 @@ const findEmployeeByIdRepository = catchAsyncRepository(
       .from(employeeTable)
       .where(whereClause)
       .limit(1);
+
     return data[0];
   }
 );
 
 const createEmployeeRepository = catchAsyncRepository(
-  async (data: CreateEmployeeDto, filter: QueryParamFilter) => {
+  async (data: CreateEmployeeDto, filter: QueryParam) => {
     const { company: companyFilter, user: userFilter } = filter;
+    const companyData = buildCompanyData(companyFilter);
+    const userData = buildUserData(userFilter, 'CREATE');
 
     const createdData = await db
       .insert(employeeTable)
       .values({
         ...data,
-        userId: userFilter.userId,
-        companyId: companyFilter.companyId,
         birthDate: data.birthDate
           ? new Date(data.birthDate).toISOString()
           : null,
         joinDate: sql`CURRENT_TIMESTAMP`,
         outDate: null,
-        createdAt: sql`CURRENT_TIMESTAMP`,
-        createdBy: userFilter.userId,
+        ...companyData,
+        ...userData,
       })
       .returning();
 
@@ -69,8 +93,9 @@ const createEmployeeRepository = catchAsyncRepository(
 );
 
 const updateEmployeeRepository = catchAsyncRepository(
-  async (id: string, data: UpdateEmployeeDto, filter: QueryParamFilter) => {
+  async (id: string, data: UpdateEmployeeDto, filter: QueryParam) => {
     const { user: userFilter } = filter;
+    const userData = buildUserData(userFilter, 'UPDATE');
 
     const whereClause = buildWhereClause({
       table: employeeTable,
@@ -86,8 +111,7 @@ const updateEmployeeRepository = catchAsyncRepository(
           : null,
         outDate: data.outDate ? new Date(data.outDate).toISOString() : null,
         isActive: !data.outDate,
-        updatedAt: sql`CURRENT_TIMESTAMP`,
-        updatedBy: userFilter.userId,
+        ...userData,
       })
       .where(whereClause)
       .returning();
@@ -97,8 +121,9 @@ const updateEmployeeRepository = catchAsyncRepository(
 );
 
 const deleteEmployeeRepository = catchAsyncRepository(
-  async (id: string, filter: QueryParamFilter) => {
+  async (id: string, filter: QueryParam) => {
     const { user: userFilter } = filter;
+    const userData = buildUserData(userFilter, 'DELETE');
 
     const whereClause = buildWhereClause({
       table: employeeTable,
@@ -109,8 +134,7 @@ const deleteEmployeeRepository = catchAsyncRepository(
       .update(employeeTable)
       .set({
         isActive: false,
-        deletedAt: sql`CURRENT_TIMESTAMP`,
-        deletedBy: userFilter.userId,
+        ...userData,
       })
       .where(whereClause)
       .returning();

@@ -1,47 +1,44 @@
-import { filterQueryResult, QueryParamFilter } from '@/lib/db';
+import { QueryParam } from '@/lib/db';
 import { NotFoundError } from '@/lib/error';
+import { filterResult } from '@/lib/validation';
 import {
   CreateEmployeeAbsenceDto,
   employeeAbsenceSchema,
 } from '../dto/employee-absence.dto';
 import { EmployeeAbsenceRepository } from '../repositories/employee-absence.repository';
 
-async function findAllEmployeeAbsenceService(filter: QueryParamFilter) {
+async function findAllEmployeeAbsenceService(filter: QueryParam) {
   const data = await EmployeeAbsenceRepository.findAll(filter);
-  console.log(data);
-  const formattedData = filterQueryResult(employeeAbsenceSchema, data);
+  const formattedData = filterResult(employeeAbsenceSchema, data);
   return formattedData;
 }
 
 async function findEmployeeAbsenceByEmployeeIdService(
   employeeId: string,
-  filter: QueryParamFilter
+  filter: QueryParam
 ) {
   const data = await EmployeeAbsenceRepository.findByEmployeeId(
     employeeId,
     filter
   );
-  const formattedData = filterQueryResult(employeeAbsenceSchema, data);
+  const formattedData = filterResult(employeeAbsenceSchema, data);
   return formattedData;
 }
 
-async function findEmployeeAbsenceByIdService(
-  id: string,
-  filter: QueryParamFilter
-) {
+async function findEmployeeAbsenceByIdService(id: string, filter: QueryParam) {
   const data = await EmployeeAbsenceRepository.findById(id, filter);
 
   if (!data) {
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(employeeAbsenceSchema, data);
+  const formattedData = filterResult(employeeAbsenceSchema, data);
   return formattedData;
 }
 
 async function createEmployeeAbsenceService(
   inputData: CreateEmployeeAbsenceDto,
-  filter: QueryParamFilter
+  filter: QueryParam
 ) {
   const data = await EmployeeAbsenceRepository.create(inputData, filter);
 
@@ -49,7 +46,7 @@ async function createEmployeeAbsenceService(
     throw new NotFoundError();
   }
 
-  const formattedData = filterQueryResult(employeeAbsenceSchema, data);
+  const formattedData = filterResult(employeeAbsenceSchema, data);
   return formattedData;
 }
 
